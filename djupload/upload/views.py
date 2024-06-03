@@ -4,11 +4,14 @@ from django.shortcuts import render
 def index(request):
     return render(request, 'upload/index.html')
 
+
+def home(request):
+    return render(request, "upload/home.html")
+
+
 def about(request):
     return render(request, "upload/about.html")
 
+
 def login(request):
     return render(request, "upload/login.html")
-
-def djupload(request):
-    return render(request, "upload/djupload.html")
