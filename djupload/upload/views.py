@@ -23,10 +23,10 @@ def home(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = FileUploadForm()
-    
+
     # Fetch the files for the logged-in user
     files = UserFile.objects.filter(user=request.user)
-    
+
     return render(request, 'upload/home.html', {'form': form, 'files': files})
 
 @login_required(login_url='upload:login')
@@ -49,8 +49,28 @@ def delete_file(request, file_uuid):
     
     return redirect('upload:home')
 
+
+# views.py
+from django.shortcuts import get_object_or_404, redirect
+from .forms import FileRenameForm
+
+@login_required(login_url='upload:login')
+def rename_file(request, file_uuid):
+    user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
+    if request.method == 'POST':
+        form = FileRenameForm(request.POST, instance=user_file)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'File renamed successfully.')
+            return redirect('upload:home')
+    else:
+        form = FileRenameForm(instance=user_file)
+    return render(request, 'upload/rename_file.html', {'form': form, 'user_file': user_file})
+
+
 def about(request):
     return render(request, "upload/about.html")
+
 
 # signup page
 def user_signup(request):
@@ -65,6 +85,7 @@ def user_signup(request):
     else:
         form = SignupForm()
     return render(request, 'upload/signup.html', {'form': form})
+
 
 # login page
 def user_login(request):
@@ -84,6 +105,7 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'upload/login.html', {'form': form})
+
 
 # logout page
 def user_logout(request):

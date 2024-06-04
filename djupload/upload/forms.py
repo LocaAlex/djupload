@@ -8,11 +8,22 @@ class SignupForm(UserCreationForm):
         model = User 
         fields = ['username', 'password1', 'password2']
 
+
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+
 class FileUploadForm(forms.ModelForm):
     class Meta:
         model = UserFile
-        fields = ['file']
+        fields = ['file', 'user_file_name']
+
+# forms.py
+from django import forms
+from .models import UserFile
+
+class FileRenameForm(forms.ModelForm):
+    class Meta:
+        model = UserFile
+        fields = ['user_file_name']

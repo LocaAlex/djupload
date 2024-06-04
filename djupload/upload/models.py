@@ -7,3 +7,4 @@ class UserFile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     file = models.FileField(upload_to='user_files/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    user_file_name = models.CharField(max_length=255, blank=True)  # New field

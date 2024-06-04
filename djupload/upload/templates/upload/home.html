@@ -58,7 +58,13 @@
                         <div class="media">
                             <div class="media-content">
                                 <p class="title is-4">
-                                    <a href="{% url 'upload:download_file' doc.uuid %}">{{ doc.file.name }}</a>
+                                    <a href="{% url 'upload:download_file' doc.uuid %}">
+                                        {% if doc.user_file_name %}
+                                            {{ doc.user_file_name }}
+                                        {% else %}
+                                            {{ doc.file.name }}
+                                        {% endif %}
+                                    </a>
                                 </p>
                             </div>
                             <div class="media-right">
