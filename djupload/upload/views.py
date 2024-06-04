@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, FileResponse
 from .models import UserFile
 from .forms import SignupForm, LoginForm, FileUploadForm
 
@@ -32,14 +32,11 @@ def home(request):
 
 def download_file(request, file_uuid):
     try:
-        user_file = UserFile.objects.get(uuid=file_uuid, user=request.user)
+        user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
     except UserFile.DoesNotExist:
-        raise Http404()
-
-    # Serve the file using Django's built-in FileResponse
-    from django.http import FileResponse
-    response = FileResponse(user_file.file)
-    return response
+        raise Http404("File does not exist or you do not have permission to access it.")
+    
+    return FileResponse(user_file.file)
 
 
 def about(request):
