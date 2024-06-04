@@ -29,7 +29,7 @@ def home(request):
     
     return render(request, 'upload/home.html', {'form': form, 'files': files})
 
-
+@login_required(login_url='upload:login')
 def download_file(request, file_uuid):
     try:
         user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
@@ -38,6 +38,16 @@ def download_file(request, file_uuid):
     
     return FileResponse(user_file.file)
 
+@login_required(login_url='upload:login')
+def delete_file(request, file_uuid):
+    try:
+        user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
+        user_file.delete()
+        messages.success(request, 'File deleted successfully.')
+    except UserFile.DoesNotExist:
+        messages.error(request, 'File does not exist or you do not have permission to delete it.')
+    
+    return redirect('upload:home')
 
 def about(request):
     return render(request, "upload/about.html")
