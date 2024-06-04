@@ -6,6 +6,13 @@
 <section class="section">
     <div class="container">
         <h1 class="title">Login</h1>
+        {% if messages %}
+            <div class="notification is-danger">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <form method="POST" class="box">
             {% csrf_token %}
             <div class="field">

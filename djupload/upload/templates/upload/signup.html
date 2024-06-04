@@ -6,7 +6,14 @@
 <section class="section">
     <div class="container">
         <h1 class="title">Signup</h1>
-        <form method="POST" class="box">
+        {% if messages %}
+            <div class="notification is-danger">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="POST" class="box" onsubmit="return validatePassword()">
             {% csrf_token %}
             <div class="field">
                 {{ form.username.label_tag }}
@@ -25,6 +32,7 @@
                 <div class="control">
                     {{ form.password2 }}
                 </div>
+                <p id="password2-help" class="help is-danger" style="display: none;">Passwords do not match.</p>
             </div>
             <div class="field">
                 <div class="control">
@@ -39,4 +47,21 @@
         </form>
     </div>
 </section>
+
+<script>
+function validatePassword() {
+    var password1 = document.getElementById("id_password1").value;
+    var password2 = document.getElementById("id_password2").value;
+    var password2Field = document.getElementById("id_password2");
+    var password2Help = document.getElementById("password2-help");
+
+    if (password1 !== password2) {
+        password2Help.style.display = "block";
+        return false;
+    } else {
+        password2Help.style.display = "none";
+        return true;
+    }
+}
+</script>
 {% endblock content %}

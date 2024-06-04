@@ -3,6 +3,23 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Home Page</h1>
-    <p>Welcome to the home page. This page has been repurposed.</p>
+<div class="container">
+    <section class="section">
+        <h2 class="title is-2">Upload File</h2>
+        <form method="post" enctype="multipart/form-data" class="box">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button is-primary">Upload</button>
+        </form>
+    </section>
+
+    <section class="section">
+        <h2 class="title is-2">Your Files</h2>
+        <ul class="list is-hoverable">
+        {% for doc in files %}
+            <li><a href="{{ doc.file.url }}">{{ doc.file.name }}</a></li>
+        {% endfor %}
+        </ul>
+    </section>
+</div>
 {% endblock %}
