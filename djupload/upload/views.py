@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from .models import UserFile
 from .forms import SignupForm, LoginForm, FileUploadForm
 
@@ -27,6 +28,19 @@ def home(request):
     files = UserFile.objects.filter(user=request.user)
     
     return render(request, 'upload/home.html', {'form': form, 'files': files})
+
+
+def download_file(request, file_uuid):
+    try:
+        user_file = UserFile.objects.get(uuid=file_uuid, user=request.user)
+    except UserFile.DoesNotExist:
+        raise Http404()
+
+    # Serve the file using Django's built-in FileResponse
+    from django.http import FileResponse
+    response = FileResponse(user_file.file)
+    return response
+
 
 def about(request):
     return render(request, "upload/about.html")
