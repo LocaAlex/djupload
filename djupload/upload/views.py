@@ -53,23 +53,25 @@ def delete_file(request, file_uuid):
 
 @login_required(login_url='upload:login')
 def rename_file(request, file_uuid):
+    try:
+        user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
+    except UserFile.DoesNotExist:
+        messages.error(request, 'File does not exist or you do not have permission to rename it.')
+        return redirect('upload:home')
+    
     if request.method == 'POST':
-        try:
-            user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
-            form = FileRenameForm(request.POST)
-            if form.is_valid():
-                user_file.user_file_name = form.cleaned_data['user_file_name']  # Access cleaned_data
-                user_file.save()
-                messages.success(request, 'File renamed successfully.')
-                return redirect('upload:home')
-            else:
-                messages.error(request, 'Please correct the error below.')
-        except UserFile.DoesNotExist:
-            messages.error(request, 'File does not exist or you do not have permission to rename it.')
+        form = FileRenameForm(request.POST, instance=user_file)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'File renamed successfully.')
+            return redirect('upload:home')
+        else:
+            messages.error(request, 'Please correct the error below.')
     else:
-        form = FileRenameForm()
+        form = FileRenameForm(instance=user_file)
 
-    return render(request, 'rename_file.html', {'form': form})  # Render the form if not POST request
+    return render(request, 'rename_file.html', {'form': form})
+
 
 
 def about(request):

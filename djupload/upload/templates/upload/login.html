@@ -5,8 +5,16 @@
 {% block content %}
 <div class="container">
     <section class="section">
-        <div class="form-container box">
-            <h2 class="title is-2">Login</h2>
+        <div class="form-container box" id="login-form">
+            <h2 class="title is-size-2">Login</h2>
+            {% if messages %}
+                <div class="notification is-danger">
+                    <button class="delete"></button>
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <form method="POST">
                 {% csrf_token %}
                 <div class="field">
@@ -36,3 +44,4 @@
     </section>
 </div>
 {% endblock %}
+

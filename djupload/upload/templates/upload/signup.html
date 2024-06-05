@@ -5,8 +5,16 @@
 {% block content %}
 <div class="container">
     <section class="section">
-        <div class="form-container box">
-            <h2 class="title is-2">Signup</h2>
+        <div class="form-container box" id="signup-form">
+            <h2 class="title is-size-2">Signup</h2>
+            {% if messages %}
+                <div class="notification is-danger">
+                    <button class="delete"></button>
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <form method="POST">
                 {% csrf_token %}
                 <div class="field">
@@ -37,6 +45,11 @@
                     <div class="control">
                         <button type="submit" class="button is-primary">Signup</button>
                     </div>
+                </div>
+                <div class="field">
+                    <p class="help">
+                        <a href="{% url 'upload:login' %}">Already have an account? Login</a>
+                    </p>
                 </div>
             </form>
         </div>
