@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'upload/style.css' %}">
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" >
     <script src="https://kit.fontawesome.com/d0643c7078.js" crossorigin="anonymous"></script>
+    {% block headers %}{% endblock %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);

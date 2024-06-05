@@ -1,8 +1,12 @@
 {% extends "upload/base.html" %}
 
 {% load custom_tags %}
+{% load static %}
 
 {% block title %}Home{% endblock %}
+{% block headers %}
+    <script src="{% static 'upload/home.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -78,23 +82,80 @@
                             <div class="column is-flex is-align-items-center">
                                 <div class="dropdown is-right is-up" id="dropdown-container" style="margin-left:auto">
                                     <div class="dropdown-trigger">
-                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-content">
+                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-content-{{ doc.uuid }}">
                                             <span class="icon is-small">
                                                 <i class="fas fa-ellipsis" aria-hidden="true"></i>
                                             </span>
                                         </button>
                                     </div>
-                                    <div id="dropdown-content" class="dropdown-menu" role="menu">
+                                    <div id="dropdown-content-{{ doc.uuid }}" class="dropdown-menu" role="menu">
                                         <div class="dropdown-content">
-                                            <form method="post" action="{% url 'upload:rename_file' doc.uuid %}" style="display:inline;">
-                                                {% csrf_token %}
-                                                {{ form.user_file_name|add_class:"input" }}
-                                                <button type="submit" class="button is-info is-small">Rename</button>
-                                            </form>
-                                            <form method="post" action="{% url 'upload:delete_file' doc.uuid %}" style="display:inline;" onsubmit="return confirmDelete();">
-                                                {% csrf_token %}
-                                                <button type="submit" class="button is-danger is-small">Delete</button>
-                                            </form>
+                                            <div class="dropdown-item">
+                                                Actions
+                                            </div>
+                                            <a class="dropdown-item js-modal-trigger" data-target="rename-modal-{{ doc.uuid }}">
+                                                <div class="columns is-mobile">
+                                                    <div class="column is-one-fifth is-flex is-justify-content-center">
+                                                        <span class="icon is-small">
+                                                            <i class="fas fa-pen" aria-hidden="true"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="column">
+                                                        <span>Rename</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <a class="dropdown-item js-modal-trigger" data-target="delete-modal-{{ doc.uuid }}">
+                                                <div class="columns is-mobile">
+                                                    <div class="column is-one-fifth is-flex is-justify-content-center">
+                                                        <span class="icon is-small">
+                                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="column">
+                                                        <span>Delete</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <div class="modal" id="rename-modal-{{ doc.uuid }}">
+                                                <div class="modal-background"></div>
+                                                <div class="modal-card">
+                                                    <header class="modal-card-head">
+                                                        <p class="modal-card-title">Rename file</p>
+                                                        <button class="delete" aria-label="close"></button>
+                                                    </header>
+                                                    <form method="post" action="{% url 'upload:rename_file' doc.uuid %}" style="display:inline;">
+                                                        <section class="modal-card-body">
+                                                            New file name:
+                                                            {% csrf_token %}
+                                                            {{ form.user_file_name|add_class:"input" }}
+                                                        </section>
+                                                        <section class="modal-card-foot">
+                                                            <button type="submit" class="button is-info">Rename</button>
+                                                        </section>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="modal" id="delete-modal-{{ doc.uuid }}">
+                                                <div class="modal-background"></div>
+                                                <div class="modal-card">
+                                                    <header class="modal-card-head">
+                                                        <p class="modal-card-title">Delete file</p>
+                                                        <button class="delete" aria-label="close"></button>
+                                                    </header>
+                                                    <section class="modal-card-body">
+                                                        Do you really want to delete this file? This action is irreversible.
+                                                    </section>
+                                                    <section class="modal-card-foot">
+                                                        <form method="post" action="{% url 'upload:delete_file' doc.uuid %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="button" class="button is-light" aria-label="close">Cancel</button>
+                                                            <button type="submit" class="button is-danger">Delete</button>
+                                                        </form>
+                                                    </section>
+                                                </div>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -109,78 +170,5 @@
             </div>
         {% endif %}
     </section>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', ()=> {
-            let fileInput = document.querySelector('.file input[type=file]');
-            fileInput.onchange = function () {
-                if (fileInput.files.length > 0) {
-                    let fileName = document.querySelector('.file-name');
-                    fileName.textContent = fileInput.files[0].name;
-                }
-            };
-
-            let deleteButtons = document.querySelectorAll('.notification .delete');
-            deleteButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    this.parentElement.style.display = 'none';
-                });
-            });
-        });
-
-        function confirmDelete() {
-            return confirm('Are you sure you want to delete this file?');
-        }
-
-        function toggleDropdown() {
-            console.log("ping");
-            let dropdown = document.querySelector('#dropdown-content');
-        
-            dropdown.classList.toggle('is-active');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get all elements with the class 'dropdown-trigger'
-            const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
-        
-            dropdownTriggers.forEach(trigger => {
-                // Add a click event listener to each dropdown trigger
-                trigger.addEventListener('click', function(event) {
-                    // Stop the event from bubbling up
-                    event.stopPropagation();
-        
-                    // Get the parent dropdown element
-                    const dropdown = trigger.closest('.dropdown');
-        
-                    // Toggle the 'is-active' class on the parent dropdown element
-                    dropdown.classList.toggle('is-active');
-        
-                    // Close all other dropdowns
-                    closeOtherDropdowns(dropdown);
-                });
-            });
-        
-            // Function to close all dropdowns
-            function closeAllDropdowns() {
-                dropdownTriggers.forEach(trigger => {
-                    const dropdown = trigger.closest('.dropdown');
-                    if (dropdown.classList.contains('is-active')) {
-                        dropdown.classList.remove('is-active');
-                    }
-                });
-            }
-        
-            // Function to close other dropdowns except the current one
-            function closeOtherDropdowns(currentDropdown) {
-                dropdownTriggers.forEach(trigger => {
-                    const dropdown = trigger.closest('.dropdown');
-                    if (dropdown !== currentDropdown && dropdown.classList.contains('is-active')) {
-                        dropdown.classList.remove('is-active');
-                    }
-                });
-            }
-        });
-        
-    </script>
 </div>
 {% endblock %}
