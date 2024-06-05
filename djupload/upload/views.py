@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, FileResponse
 from .models import UserFile
-from .forms import SignupForm, LoginForm, FileUploadForm
+from .forms import SignupForm, LoginForm, FileUploadForm, FileRenameForm
 
 def index(request):
     return render(request, 'upload/index.html')
@@ -29,6 +29,7 @@ def home(request):
 
     return render(request, 'upload/home.html', {'form': form, 'files': files})
 
+
 @login_required(login_url='upload:login')
 def download_file(request, file_uuid):
     try:
@@ -50,22 +51,25 @@ def delete_file(request, file_uuid):
     return redirect('upload:home')
 
 
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from .forms import FileRenameForm
-
 @login_required(login_url='upload:login')
 def rename_file(request, file_uuid):
-    user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
     if request.method == 'POST':
-        form = FileRenameForm(request.POST, instance=user_file)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'File renamed successfully.')
-            return redirect('upload:home')
+        try:
+            user_file = get_object_or_404(UserFile, uuid=file_uuid, user=request.user)
+            form = FileRenameForm(request.POST)
+            if form.is_valid():
+                user_file.user_file_name = form.cleaned_data['user_file_name']  # Access cleaned_data
+                user_file.save()
+                messages.success(request, 'File renamed successfully.')
+                return redirect('upload:home')
+            else:
+                messages.error(request, 'Please correct the error below.')
+        except UserFile.DoesNotExist:
+            messages.error(request, 'File does not exist or you do not have permission to rename it.')
     else:
-        form = FileRenameForm(instance=user_file)
-    return render(request, 'upload/rename_file.html', {'form': form, 'user_file': user_file})
+        form = FileRenameForm()
+
+    return render(request, 'rename_file.html', {'form': form})  # Render the form if not POST request
 
 
 def about(request):

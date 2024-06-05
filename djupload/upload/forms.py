@@ -19,9 +19,14 @@ class FileUploadForm(forms.ModelForm):
         model = UserFile
         fields = ['file', 'user_file_name']
 
-# forms.py
-from django import forms
-from .models import UserFile
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if not instance.user_file_name:
+            instance.user_file_name = instance.file.name
+        if commit:
+            instance.save()
+        return instance
+
 
 class FileRenameForm(forms.ModelForm):
     class Meta:

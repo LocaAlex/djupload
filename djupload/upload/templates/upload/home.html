@@ -27,9 +27,6 @@
                                 {{ form.file }}
                             </div>
                             <span class="file-cta">
-                                <span class="file-icon">
-                                    <i class="fas fa-upload"></i>
-                                </span>
                                 <span class="file-label">
                                     Choose a file…
                                 </span>
@@ -69,6 +66,11 @@
                             </div>
                             <div class="media-right">
                                 <p class="subtitle is-6">{{ doc.uploaded_at|date:"F j, Y, g:i a" }}</p>
+                                <form method="post" action="{% url 'upload:rename_file' doc.uuid %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    {{ form.user_file_name}}
+                                    <button type="submit" class="button is-info is-small">Rename</button>
+                                </form>
                                 <form method="post" action="{% url 'upload:delete_file' doc.uuid %}" style="display:inline;" onsubmit="return confirmDelete();">
                                     {% csrf_token %}
                                     <button type="submit" class="button is-danger is-small">Delete</button>
